@@ -1,0 +1,4 @@
+*.pid
+*.py[cod]
+cache
+output
