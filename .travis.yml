@@ -6,3 +6,6 @@ install:
   - pip install -r requirements.txt
 script:
   - make github
+env:
+  global:
+    secure: DkQyVltZMDS8jnFerlhfwwuZBk7TqAKimrIkJ21qb3p9j7zj8ndJQMPeWhqqPQqanTnXxb62L8c84QEYY42ygBOVatDrbx2Z932bhGmzdAJNDlE4DRXyEDW/bwOJCVs9pqzKub+oh3Y4ropIyClu+oH0kyFM5O3Lh5roOi12BYQ=
