@@ -18,10 +18,14 @@ CATEGORY_FEED_ATOM = 'feeds/%s.atom.xml'
 
 DELETE_OUTPUT_DIRECTORY = True
 
-STATIC_PATHS = ['images', 'extra/CNAME']
-EXTRA_PATH_METADATA = {
+STATIC_PATHS.extend([
+    'extra/CNAME',
+    'extra/keybase.txt',
+])
+EXTRA_PATH_METADATA.update({
     'extra/CNAME': {'path': 'CNAME'},
-}
+    'extra/keybase.txt': {'path': 'keybase.txt'},
+})
 
 DISQUS_SITENAME = 'elyezer'
 GOOGLE_ANALYTICS = 'UA-71148736-1'

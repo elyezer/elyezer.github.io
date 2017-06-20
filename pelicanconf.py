@@ -28,8 +28,8 @@ SOCIAL = (('Twitter', 'https://twitter.com/elyezer'),
 
 DEFAULT_PAGINATION = 10
 
-STATIC_PATHS = ['images', 'extra/CNAME']
-EXTRA_PATH_METADATA = {'extra/CNAME': {'path': 'CNAME'}}
+STATIC_PATHS = ['images']
+EXTRA_PATH_METADATA = {}
 
 
 # Uncomment following line if you want document-relative URLs when developing
