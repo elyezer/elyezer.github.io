@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    {% include 'includes/analytics.html' %}
+    <title>{% block title %}{{ SITENAME }}{%endblock%}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% block meta %}
+    <meta name="author" content="{{ AUTHOR }}" />
+    {% endblock %}
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    {% if 'tipue_search' in PLUGINS %}
+    <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/tipuesearch.css" />
+    {% endif %}
+    <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/{{ CSS_FILE }}" />
+
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+    {% if FEED_ALL_ATOM %}
+    <link href="{{ FEED_DOMAIN }}/{{ FEED_ALL_ATOM }}" type="application/atom+xml" rel="alternate" title="{{ SITENAME }} Full Atom Feed" />
+    {% endif %}
+    {% if FEED_ALL_RSS %}
+    <link href="{{ FEED_DOMAIN }}/{{ FEED_ALL_RSS }}" type="application/rss+xml" rel="alternate" title="{{ SITENAME }} Full RSS Feed" />
+    {% endif %}
+    {% if FEED_ATOM %}
+    <link href="{{ FEED_DOMAIN }}/{{ FEED_ATOM }}" type="application/atom+xml" rel="alternate" title="{{ SITENAME }} Atom Feed" />
+    {% endif %}
+    {% if FEED_RSS %}
+    <link href="{{ FEED_DOMAIN }}/{{ FEED_RSS }}" type="application/rss+xml" rel="alternate" title="{{ SITENAME }} RSS Feed" />
+    {% endif %}
+    {% if CATEGORY_FEED_ATOM and category %}
+    <link href="{{ FEED_DOMAIN }}/{{ CATEGORY_FEED_ATOM|format(category.slug) }}" type="application/atom+xml" rel="alternate" title="{{ SITENAME }} Categories Atom Feed" />
+    {% endif %}
+    {% if CATEGORY_FEED_RSS and category %}
+    <link href="{{ FEED_DOMAIN }}/{{ CATEGORY_FEED_RSS|format(category.slug) }}" type="application/rss+xml" rel="alternate" title="{{ SITENAME }} Categories RSS Feed" />
+    {% endif %}
+    {% if TAG_FEED_ATOM and tag %}
+    <link href="{{ FEED_DOMAIN }}/{{ TAG_FEED_ATOM|format(tag.slug) }}" type="application/atom+xml" rel="alternate" title="{{ SITENAME }} Tags Atom Feed" />
+    {% endif %}
+    {% if TAG_FEED_RSS and tag %}
+    <link href="{{ FEED_DOMAIN }}/{{ TAG_FEED_RSS|format(tag.slug) }}" type="application/rss+xml" rel="alternate" title="{{ SITENAME }} Tags RSS Feed" />
+    {% endif %}
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-md fixed-top navbar-light">
+      <a class="navbar-brand" href="{{ SITEURL }}/">{{ SITENAME }}</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        {% for title, link in MENUITEMS %}
+          <li class="nav-item"><a class="nav-link" href="{{ link }}">{{ title }}</a></li>
+        {% endfor %}
+        {% if DISPLAY_PAGES_ON_MENU %}
+          {% for p in pages %}
+            <li class="nav-item{% if p == page %} active{% endif %}">
+              <a class="nav-link" href="{{ SITEURL }}/{{ p.url }}">{{ p.title }}{% if p == page %} <span class="sr-only">(current)</span>{% endif %}</a>
+            </li>
+          {% endfor %}
+        {% endif %}
+        {% if not DISPLAY_CATEGORIES_ON_SIDEBAR and DISPLAY_CATEGORIES_ON_MENU %}
+          {% for cat, null in categories %}
+            <li class="nav-item{% if cat == category %} active{% endif %}">
+              <a class="nav-link" href="{{ SITEURL }}/{{ cat.url }}">{{ cat }}{% if cat == category %} <span class="sr-only">(current)</span>{% endif %}</a>
+            </li>
+          {% endfor %}
+        {% endif %}
+        </ul>
+        {% if 'tipue_search' in PLUGINS %}
+        <form class="form-inline my-2 my-lg-0" action="{{ SEARCH_URL | default('/search/') }}">
+          <input class="form-control mr-sm-2" id="tipue_search_input" name="q" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-9">
+          {% block content %}{% endblock %}
+        </div>
+        <aside id="sidebar" class="col-3">
+          {% if ABOUTME or AVATAR %}
+          <section id="aboutme">
+            {% if AVATAR %}
+            <p>
+              <img class="d-block img-thumbnail mx-auto rounded-circle" src="{{ SITEURL }}/{{ AVATAR }}"/>
+            </p>
+            {% endif %}
+            {% if ABOUT_ME %}
+            <p><strong>{{ AUTHOR }}</strong> {{ ABOUT_ME }}</p>
+            {% endif %}
+          </section><!-- #aboutme -->
+          {% endif %}
+
+          {% if SOCIAL %}
+          <section id="social">
+            <h4>Social</h4>
+            <div class="list-group list-group-flush">
+              {% for name, url in SOCIAL %}
+              <a class="list-group-item list-group-item-action" href="{{ url
+                }}" target="_blank"><i class="fab fa-{{ name|lower }}"></i> {{ name }}</a>
+              {% endfor %}
+            </div><!-- .list-group -->
+          </section><!-- #social -->
+          {% endif %}
+
+          {% if DISPLAY_CATEGORIES_ON_SIDEBAR %}
+          <section id="categories">
+            <h4>Categories</h4>
+            <div class="list-group list-group-flush">
+              {% for cat, null in categories %}
+              <a href="{{ SITEURL }}/{{ cat.url }}" class="list-group-item list-group-item-action{% if cat == category %} active{% endif %}">
+                <i class="fa fa-folder-open"></i>
+                {{ cat }}
+              </a>
+              {% endfor %}
+            </div><!-- .list-group -->
+          </section><!-- #categories -->
+          {% endif %}
+
+          {% if LINKS %}
+          <section id="links">
+            <h4>Links</h4>
+            <div class="list-group list-group-flush">
+              {% for name, link in LINKS %}
+              <a href="{{ link }}" class="list-group-item list-group-item-action" target="_blank">
+                <i class="fas fa-external-link-alt"></i>
+                {{ name }}
+              </a>
+              {% endfor %}
+            </div><!-- .list-group -->
+          </section><!-- #links -->
+          {% endif %}
+
+          <section id="archive">
+            <h4>Archive</h4>
+            <div class="list-group list-group-flush">
+              {% for year, date_year in dates|groupby( 'date.year' )|sort(reverse=True) %}
+              {% for month, articles in date_year|groupby( 'date.month' )|sort(reverse=True) %}
+              <a href="{{ link }}" class="list-group-item list-group-item-action">
+                <i class="far fa-calendar-alt"></i>
+                {{ articles[0].date.strftime('%B') }} {{ year }} ({{ articles|count }})
+              </a>
+              {% endfor %}
+              {% endfor %}
+            </div><!-- .list-group -->
+          </section><!-- #archive -->
+        </aside>
+      </div><!-- .row -->
+    </div><!-- .container -->
+
+    <footer id="footer" class="bg-light">
+      <p>
+        Powered by
+        <a href="http://getbootstrap.com" target="_blank">Bootstrap</a> and
+        <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>.
+      </p>
+      {% if CC_LICENSE or CC_LICENSE_DERIVATIVES or CC_LICENSE_COMMERCIAL %}
+      {% from 'includes/cc-license.html' import cc_license_mark %}
+      <p><small>{{ cc_license_mark(cc_name=CC_LICENSE,derivatives=CC_LICENSE_DERIVATIVES,commercial=CC_LICENSE_COMMERCIAL,attr_markup=CC_ATTR_MARKUP,attr_props={'title':SITENAME,'name':article.author if article else AUTHOR,'url':SITEURL,'lang':DEFAULT_LANG}) }}</small></p>
+      {% endif %}
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    {% block scripts %}{% endblock %}
+    {% if DISQUS_SHORTNAME %}
+    <script id="dsq-count-scr" src="//{{ DISQUS_SHORTNAME }}.disqus.com/count.js" async></script>
+    {% endif %}
+  </body>
+</html>

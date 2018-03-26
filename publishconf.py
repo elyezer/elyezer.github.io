@@ -26,5 +26,5 @@ EXTRA_PATH_METADATA.update({
     'extra/keybase.txt': {'path': 'keybase.txt'},
 })
 
-DISQUS_SITENAME = 'elyezer'
-GOOGLE_ANALYTICS = 'UA-71148736-1'
+DISQUS_SHORTNAME = 'elyezer'
+GA_TRACKING_ID = 'UA-71148736-1'
