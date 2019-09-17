@@ -8,4 +8,4 @@ script:
   - make travis
 env:
   global:
-    secure: IqTr2/RIIWmA+XI+Z7bBTVUuqx9hV/Hep8Ya7GZ16KK4jpMdjQhAT1x16fjNb23IcuqGcg/9km7/gbwGmhPjLNEMlo7n8g586JDuNc/p5JX/aAFy2SwPyzyn4qCqiFvqpZ2QERtijakrXZJ5C0lTn1ENGJyx2nFh91enxHgLIOk=
+    secure: "azRFU50Tw9oaMXSwsXYAfqQ82WzRqKnap867dgSne6w2zZcctnh7yuYxa946S0MCTRG4V8kbkS6yJXvH+k8CzaBRlQ8L/2cQi7A5qJPlo3M1P5txA12PGBwTEMHGjkosvOQidGGUy6CMOWLsIyYBsl8UJRHYiwV+QreindpTBkk="
