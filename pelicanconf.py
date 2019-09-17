@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*- #
-from __future__ import unicode_literals
 
-AUTHOR = u'Ely\xe9zer Rezende'
-SITENAME = u'Ely\xe9zer Rezende'
+AUTHOR = SITENAME = 'Elyézer Rezende'
 SITEURL = ''
 
 PATH = 'content'
