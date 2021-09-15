@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-71148736-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-71148736-1');
+</script>
+    <title>Running UI tests on Travis - Elyézer Rezende</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <meta name="author" content="Elyézer Rezende" />
+  <meta name="keywords" content="pytest pytest-selenium python" />
+  <meta name="description" content="Travis allows you to run Chrome and Firefox on their build environment and those can be used to run UI tests using Selenium. Today we are going to see how to install chromedriver and geckodriver in order to be able to run UI tests using pytest-selenium. To run those tests …" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://elyezer.com/static/css/tipuesearch.css" />
+    <link rel="stylesheet" href="https://elyezer.com/static/css/main.css" />
+
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+
+    <link href="https://elyezer.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Elyézer Rezende Full Atom Feed" />
+    <link href="https://elyezer.com/feeds/quality-engineering.atom.xml" type="application/atom+xml" rel="alternate" title="Elyézer Rezende Categories Atom Feed" />
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-md fixed-top navbar-light">
+      <a class="navbar-brand" href="https://elyezer.com/">Elyézer Rezende</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="https://elyezer.com/pages/about/">About</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0" action="/search/">
+          <input class="form-control mr-sm-2" id="tipue_search_input" name="q" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-9">
+<section id="content">
+  <article clas="hentry">
+    <header class="entry-header">
+      <div class="entry-meta">
+        <i class="far fa-calendar-alt"></i>
+        <time class="entry-date" datetime="2018-06-07T00:00:00-03:00">Thu 07 June 2018</time>
+
+<i class="far fa-comments"></i> <a href="https://elyezer.com/running-ui-tests-on-travis/#disqus_thread">comments</a>
+        <i class="far fa-user"></i>
+        <a href="https://elyezer.com/author/elyezer-rezende/">Elyézer Rezende</a>
+      </div><!-- /.entry-meta -->
+      <h1>
+        <a href="https://elyezer.com/running-ui-tests-on-travis/"
+          rel="bookmark"
+          title="Permalink to Running UI tests on Travis">
+          Running UI tests on Travis
+        </a>
+      </h1>
+    </header>
+    <div class="entry-content">
+      <p>Travis allows you to run <a class="reference external" href="https://docs.travis-ci.com/user/chrome">Chrome</a> and
+<a class="reference external" href="https://docs.travis-ci.com/user/firefox">Firefox</a> on their build environment
+and those can be used to run UI tests using Selenium.</p>
+<p>Today we are going to see how to install <cite>chromedriver</cite> and <cite>geckodriver</cite> in
+order to be able to run UI tests using <a class="reference external" href="https://pytest-selenium.readthedocs.io">pytest-selenium</a>. To run those tests you will need to
+have your web application running so that Travis can access it and this article
+won't cover that.</p>
+<p>Assuming that you already have Travis setup for your project, the first step to
+do is to enable the Chrome and Firefox addons. You can do that by adding the
+following lines to your <tt class="docutils literal">.travis.yml</tt> file:</p>
+<div class="highlight"><pre><span></span><span class="nt">addons</span><span class="p">:</span>
+  <span class="nt">chrome</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">stable</span>
+  <span class="nt">firefox</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">latest</span>
+</pre></div>
+<p>Those lines will make Travis make available both Chrome and Firefox but that
+won't install neither <cite>chromedrive</cite> and <cite>geckodriver</cite> which are required to run
+Selenium webdriver. To make the process of setting up them, let's create some
+scripts.</p>
+<p>First create the <tt class="docutils literal">setup_chromedriver.sh</tt> script:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="nb">set</span> -euvo pipefail
+
+<span class="nb">export</span> <span class="nv">LATEST_CHROMEDRIVER</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE<span class="k">)</span><span class="s2">&quot;</span>
+curl -L -s -o /tmp/chromedriver.zip <span class="s2">&quot;https://chromedriver.storage.googleapis.com/</span><span class="si">${</span><span class="nv">LATEST_CHROMEDRIVER</span><span class="si">}</span><span class="s2">/chromedriver_linux64.zip&quot;</span>
+mkdir <span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/chromedriver&quot;</span>
+unzip /tmp/chromedriver.zip -d <span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/chromedriver&quot;</span>
+</pre></div>
+<p>The script is checking for the latest <cite>chromedriver</cite> and downloading it. Next
+it creates a diretory where the <tt class="docutils literal">chromedriver</tt> executable will be placed. We
+are creating a directory because later we will be adding that directory to the
+<tt class="docutils literal">PATH</tt>.</p>
+<p>Next is time to create the <tt class="docutils literal">setup_geckodriver.sh</tt> script:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="nb">set</span> -euvo pipefail
+
+curl -L -s -o geckodriverrelease https://api.github.com/repos/mozilla/geckodriver/releases/latest
+
+cat &gt; parser.py <span class="s">&lt;&lt;EOF</span>
+<span class="s">import sys, json</span>
+<span class="s">r = json.load(sys.stdin)</span>
+<span class="s">if &#39;assets&#39; in r:</span>
+<span class="s">    print([a for a in r[&#39;assets&#39;] if &#39;linux64&#39; in a[&#39;name&#39;]][0][&#39;browser_download_url&#39;]);</span>
+<span class="s">else:</span>
+<span class="s">    print(&#39;https://github.com/mozilla/geckodriver/releases/download/v0.20.1/geckodriver-v0.20.1-linux64.tar.gz&#39;)</span>
+<span class="s">EOF</span>
+
+<span class="nb">export</span> <span class="nv">GECKODRIVER_DOWNLOAD</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>cat geckodriverrelease <span class="p">|</span> python parser.py<span class="k">)</span><span class="s2">&quot;</span>
+curl -L -s -o /tmp/geckodriver.tar.gz <span class="s2">&quot;</span><span class="si">${</span><span class="nv">GECKODRIVER_DOWNLOAD</span><span class="si">}</span><span class="s2">&quot;</span>
+
+mkdir <span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/geckodriver&quot;</span>
+tar xvf /tmp/geckodriver.tar.gz -C <span class="s2">&quot;</span><span class="si">${</span><span class="nv">HOME</span><span class="si">}</span><span class="s2">/geckodriver&quot;</span>
+</pre></div>
+<p>As you can see, to install the latest <cite>geckodriver</cite> it requires some extra
+logic. See below a detailed explanation about why that is required.</p>
+<p><cite>geckodriver</cite> is hosted on Github and you can get the latest release
+information using Github's API. The script is fetching that information by
+doing an unauthenticated request. The problem with unauthenticated requests to
+Github's API is that it limits, currently, to 60 requests per hour. Even though
+your project's tests may run once a day you can hit that request limit because
+the Travis environment is shared.</p>
+<p>To avoid the hitting the request rate limit and to parse the information about
+the latest limit the script is creating the <tt class="docutils literal">parser.py</tt> Python script that
+will fetch the URL for the latest release by parsing the JSON response (saved
+on <tt class="docutils literal">geckodriverrelease</tt> file by curl) or default to the current latest
+release URL if the Github API's rate limite is hit.</p>
+<p>After fetching the proper URL to download the latest <cite>geckodriver</cite> the script
+go ahead and get it and place it on the created <tt class="docutils literal">geckodriver</tt> directory. Same
+as <cite>chromedriver</cite> this directory will be added later to the <tt class="docutils literal">PATH</tt>.</p>
+<p>With all that in place, it is time to edit the <tt class="docutils literal">.travis.yml</tt> file again and
+make it run the UI tests. In the example we are going to see here, both setup
+scripts were placed into a <tt class="docutils literal">scripts</tt> directory on the projects repository's
+root directory.</p>
+<p>To make it more visually appealing on Travis let's run UI tests using <a class="reference external" href="https://docs.travis-ci.com/user/build-stages/">build
+stages</a>. Below are the
+definitions for the jobs to run tests using both Chrome and Firefox on
+separated jobs. The environment variable <tt class="docutils literal">NAME</tt> is there just provide context
+on Travis UI since you can't set jobs name as of now. On the <tt class="docutils literal">before_install</tt>
+section of each job is where <cite>chromedriver</cite> and <cite>geckodriver</cite> are setup and the
+executables are added to the <tt class="docutils literal">PATH</tt>. Finally the tests are running on the
+<tt class="docutils literal">script</tt> section using <tt class="docutils literal"><span class="pre">xvfb-run</span></tt> which is required to run the browsers in
+headless mode.</p>
+<div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">stage</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test-ui</span>
+  <span class="nt">env</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">NAME=ui-chrome</span>
+  <span class="nt">before_install</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./scripts/setup_chromedriver.sh</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">export PATH=&quot;${HOME}/chromedriver:${PATH}&quot;</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">chromedriver --version</span>
+  <span class="nt">install</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">make run-web-app</span>
+  <span class="nt">script</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">xvfb-run py.test -v --driver Chrome path/to/ui/tests</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">stage</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test-ui</span>
+  <span class="nt">env</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">NAME=ui-firefox</span>
+  <span class="nt">before_install</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./scripts/setup_geckodriver.sh</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">export PATH=&quot;${HOME}/geckodriver:${PATH}&quot;</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">geckodriver --version</span>
+  <span class="nt">install</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">make run-web-app</span>
+  <span class="nt">script</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">xvfb-run py.test -v --driver Firefox path/to/ui/tests</span>
+</pre></div>
+<p>After all that you should be able to run UI tests on Travis. If you want a full
+<tt class="docutils literal">.travis.yml</tt> example you can check <a class="reference external" href="https://github.com/cloudigrade/integrade/blob/master/.travis.yml">integrade's .travis.yml</a>.</p>
+
+    </div> <!-- /.entry-content -->
+    <footer class="entry-footer">
+      <p>
+        <i class="fa fa-folder-open"></i>
+        <a href="https://elyezer.com/category/quality-engineering/">Quality Engineering</a>
+      </p>
+
+      <p>
+        <i class="fa fa-tags"></i>
+        <a href="https://elyezer.com/tag/pytest-pytest-selenium-python/">pytest pytest-selenium python</a>      </p>
+    </footer><!-- /.entry-footer -->
+  </article>
+</section>
+
+<section class="comments" id="comments">
+  <h2>Comments</h2>
+
+  <div id="disqus_thread"></div>
+  <script>
+    var disqus_config = function () {
+      this.page.url = 'https://elyezer.com/running-ui-tests-on-travis/';
+      this.page.identifier = 'running-ui-tests-on-travis/';
+    };
+    (function() {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://elyezer.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the comments.</noscript>
+</section>
+        </div>
+        <aside id="sidebar" class="col-md-3">
+          <section id="aboutme">
+            <p>
+              <img class="d-block img-thumbnail mx-auto rounded-circle" src="https://elyezer.com/images/elyezer-rezende.jpg"/>
+            </p>
+            <p><strong>Elyézer Rezende</strong> is a Red Hatter, Quality Engineer, Pythonista, Open Source advocate, Podcaster and Dad.</p>
+          </section><!-- #aboutme -->
+
+          <section id="social">
+            <h4>Social</h4>
+            <div class="list-group list-group-flush">
+              <a class="list-group-item list-group-item-action" href="https://www.facebook.com/elyezer" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
+              <a class="list-group-item list-group-item-action" href="https://github.com/elyezer" target="_blank"><i class="fab fa-github"></i> Github</a>
+              <a class="list-group-item list-group-item-action" href="https://www.linkedin.com/in/elyezer" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+              <a class="list-group-item list-group-item-action" href="https://twitter.com/elyezer" target="_blank"><i class="fab fa-twitter"></i> Twitter</a>
+            </div><!-- .list-group -->
+          </section><!-- #social -->
+
+          <section id="categories">
+            <h4>Categories</h4>
+            <div class="list-group list-group-flush">
+              <a href="https://elyezer.com/category/python/" class="list-group-item list-group-item-action">
+                <i class="fa fa-folder-open"></i>
+                Python
+              </a>
+              <a href="https://elyezer.com/category/quality-engineering/" class="list-group-item list-group-item-action active">
+                <i class="fa fa-folder-open"></i>
+                Quality Engineering
+              </a>
+            </div><!-- .list-group -->
+          </section><!-- #categories -->
+
+          <section id="links">
+            <h4>Links</h4>
+            <div class="list-group list-group-flush">
+              <a href="http://castalio.info/" class="list-group-item list-group-item-action" target="_blank">
+                <i class="fas fa-external-link-alt"></i>
+                Castálio Podcast
+              </a>
+            </div><!-- .list-group -->
+          </section><!-- #links -->
+
+          <section id="archive">
+            <h4>Archive</h4>
+            <div class="list-group list-group-flush">
+              <a href="" class="list-group-item list-group-item-action">
+                <i class="far fa-calendar-alt"></i>
+                June 2018 (1)
+              </a>
+              <a href="" class="list-group-item list-group-item-action">
+                <i class="far fa-calendar-alt"></i>
+                March 2018 (1)
+              </a>
+            </div><!-- .list-group -->
+          </section><!-- #archive -->
+        </aside>
+      </div><!-- .row -->
+    </div><!-- .container -->
+
+    <footer id="footer" class="bg-light">
+      <p>
+        Powered by
+        <a href="http://getbootstrap.com" target="_blank">Bootstrap</a> and
+        <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>.
+      </p>
+      <p><small>  <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script id="dsq-count-scr" src="//elyezer.disqus.com/count.js" async></script>
+  </body>
+</html>

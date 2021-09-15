@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/elyezer
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://elyezer.com
+  * I am elyezer (https://keybase.io/elyezer) on keybase.
+  * I have a public key ASAXJ1HBwswA7eejf4hwjdLnSjnoZjpjgOM9q53o_2lhngo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120172751c1c2cc00ede7a37f88708dd2e74a39e8663a6380e33dab9de8ff69619e0a",
+      "host": "keybase.io",
+      "kid": "0120172751c1c2cc00ede7a37f88708dd2e74a39e8663a6380e33dab9de8ff69619e0a",
+      "uid": "0d5cc76ae6b5b5836c93f802f10c0419",
+      "username": "elyezer"
+    },
+    "merkle_root": {
+      "ctime": 1568811755,
+      "hash": "13c575c945104d2c65b51da013dbae457ae4c2235812d9a3bb11f37b0bccef0bb8b7e987ebae68c89988c9139bf034cee57483a00ad2ad49c15fcc978ca83696",
+      "hash_meta": "ffd74f358191f7d94dd9c863a862cdc13a418ef6ea863b069e0b3f29df838e6e",
+      "seqno": 7559622
+    },
+    "service": {
+      "entropy": "KQuL5/AI5arMNnVn3nYczEbj",
+      "hostname": "elyezer.com",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "4.4.2"
+  },
+  "ctime": 1568811760,
+  "expire_in": 504576000,
+  "prev": "fa4a9bb6b81f353ecf9423b3fc4c749e8d2943c6d68af22eaaeb96e1e4d18884",
+  "seqno": 51,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgFydRwcLMAO3no3+IcI3S50o56GY6Y4DjPaud6P9pYZ4Kp3BheWxvYWTESpcCM8Qg+kqbtrgfNT7PlCOz/Ex0no0pQ8bWivIuquuW4eTRiITEIO7xmUFCIXh/e/E3QF9saKTwBmZ5LAR8GUZZozuGAFXuAgHCo3NpZ8RAEAHh4rqMZMPvSk01zaKp44ZHoBfbuBDB21TjYovsnpl8nf0oMVLqfx1Wt7iKXhWURc/jE0gk1ll/rPaYZQaACKhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEILRgKA9B0KovhlFrv7q1jHvYKl/GM3BGZeK974RES05ro3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/elyezer
+
+==================================================================
