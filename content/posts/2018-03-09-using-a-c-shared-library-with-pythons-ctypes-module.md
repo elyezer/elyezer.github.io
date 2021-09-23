@@ -1,40 +1,40 @@
-Using a C shared library with Python's ctypes module
-####################################################
-:author: Elyézer Rezende
-:category: Python
-:tags: python
-:status: published
++++
+title = "Using a C shared library with Python's ctypes module"
+category = "Python"
+date = "2018-03-09"
+slug = "using-a-c-shared-library-with-python-ctypes-module"
+tags = ["python"]
++++
 
 To demonstrate how to create a shared C library and using it with Python's
-`ctypes`_ library we are going to create a shared C library. First create the C
+[ctypes] library we are going to create a shared C library. First create the C
 header file `mean.h`:
 
-.. code-block:: c
-
+```c
     // Returns the mean of passed parameters
     double mean(double, double);
+```
 
 Next create the C file `mean.c`:
 
-.. code-block:: c
-
+```c
     #include "mean.h"
 
     double mean(double a, double b) {
         return (a+b)/2;
     }
+```
 
 Now we can create the shared C library by compiling it using `gcc`:
 
-.. code-block:: console
-
+```console
     $ gcc -shared -o libmean.so.1 mean.c
+```
 
 Finally we can import the shared C library using the ctypes Python module,
 consider the following interative shell:
 
-.. code-block:: python
-
+```python
     >>> import ctypes
     >>> libmean = ctypes.CDLL('./libmean.so.1') # loads the shared library
     >>> libmean.mean.restype = ctypes.c_double # define mean function return type
@@ -45,10 +45,10 @@ consider the following interative shell:
     6.5
     >>> type(libmean.mean(10, 5)) # returned value is converted to python types
     <class 'float'>
-
+```
 
 This was tested using Python 3.6.4 and gcc 7.3.1 on Fedora 27. Check the
-`ctypes`_ documentation for more information.
+[ctypes] documentation for more information.
 
 
-.. _ctypes: https://docs.python.org/3/library/ctypes.html
+[ctypes]: https://docs.python.org/3/library/ctypes.html

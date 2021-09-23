@@ -1,0 +1,53 @@
+baseURL = "https://elyezer.com/"
+disqusShortname = "elyezer"
+googleAnalytics = "UA-71148736-1"
+languageCode = "en-us"
+theme = "PaperMod"
+
+[params]
+  author = "Elyézer Rezende"
+  comments = true
+  defaultTheme = "dark"
+  ShowShareButtons = true
+  ShowReadingTime = true
+  ShowCodeCopyButtons = true
+
+  [[params.socialIcons]]
+    name = "github"
+    url = "https://github.com/elyezer"
+  [[params.socialIcons]]
+    name = "instagram"
+    url = "https://instagram.com/elyezermr"
+  [[params.socialIcons]]
+    name = "linkedin"
+    url = "https://www.linkedin.com/in/elyezer"
+  [[params.socialIcons]]
+    name = "twitter"
+    url = "https://twitter.com/elyezer"
+
+
+  [params.homeInfoParams]
+    Title = "Hello!"
+    Content = """\
+      My name is **Elyézer Rezende** and I am a Red Hatter, Quality Engineer, \
+      Pythonista, Open Source advocate, [Podcaster](https://castalio.info) \
+      and Dad. You can connect with me on the following social platforms:
+    """
+
+[languages]
+  [languages.en]
+    title = "Elyézer Rezende"
+
+    [languages.en.params.logo]
+      logoText = "Elyézer Rezende"
+      logoHomeLink = "/"
+
+    [languages.en.menu]
+      [[languages.en.menu.main]]
+        identifier = "about"
+        name = "About"
+        url = "/about"
+      [[languages.en.menu.main]]
+        identifier = "archives"
+        name = "Archive"
+        url = "/archives"

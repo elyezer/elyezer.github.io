@@ -1,28 +1,30 @@
-Running UI tests on Travis
-##########################
-:category: Quality Engineering
-:tags: pytest pytest-selenium python
-:status: published
++++
+title = "Running UI tests on Travis"
+category = "Quality Engineering"
+date = "2018-06-07"
+slug = "running-ui-tests-on-travis"
+tags = ["pytest", "pytest-selenium", "python"]
++++
 
-Travis allows you to run `Chrome <https://docs.travis-ci.com/user/chrome>`_ and
-`Firefox <https://docs.travis-ci.com/user/firefox>`_ on their build environment
+Travis allows you to run [Chrome](https://docs.travis-ci.com/user/chrome) and
+[Firefox](https://docs.travis-ci.com/user/firefox) on their build environment
 and those can be used to run UI tests using Selenium.
 
 Today we are going to see how to install `chromedriver` and `geckodriver` in
-order to be able to run UI tests using `pytest-selenium
-<https://pytest-selenium.readthedocs.io>`_. To run those tests you will need to
-have your web application running so that Travis can access it and this article
-won't cover that.
+order to be able to run UI tests using
+[pytest-selenium](https://pytest-selenium.readthedocs.io). To run those tests
+you will need to have your web application running so that Travis can access it
+and this article won't cover that.
 
 Assuming that you already have Travis setup for your project, the first step to
 do is to enable the Chrome and Firefox addons. You can do that by adding the
 following lines to your ``.travis.yml`` file:
 
-.. code-block:: yaml
-
+```yaml
     addons:
       chrome: stable
       firefox: latest
+```
 
 Those lines will make Travis make available both Chrome and Firefox but that
 won't install neither `chromedrive` and `geckodriver` which are required to run
@@ -31,8 +33,7 @@ scripts.
 
 First create the ``setup_chromedriver.sh`` script:
 
-.. code-block:: bash
-
+```bash
     #!/bin/bash
     set -euvo pipefail
 
@@ -40,6 +41,7 @@ First create the ``setup_chromedriver.sh`` script:
     curl -L -s -o /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER}/chromedriver_linux64.zip"
     mkdir "${HOME}/chromedriver"
     unzip /tmp/chromedriver.zip -d "${HOME}/chromedriver"
+```
 
 The script is checking for the latest `chromedriver` and downloading it. Next
 it creates a diretory where the ``chromedriver`` executable will be placed. We
@@ -48,8 +50,7 @@ are creating a directory because later we will be adding that directory to the
 
 Next is time to create the ``setup_geckodriver.sh`` script:
 
-.. code-block:: bash
-
+```bash
     #!/bin/bash
     set -euvo pipefail
 
@@ -69,6 +70,7 @@ Next is time to create the ``setup_geckodriver.sh`` script:
 
     mkdir "${HOME}/geckodriver"
     tar xvf /tmp/geckodriver.tar.gz -C "${HOME}/geckodriver"
+```
 
 As you can see, to install the latest `geckodriver` it requires some extra
 logic. See below a detailed explanation about why that is required.
@@ -95,8 +97,8 @@ make it run the UI tests. In the example we are going to see here, both setup
 scripts were placed into a ``scripts`` directory on the projects repository's
 root directory.
 
-To make it more visually appealing on Travis let's run UI tests using `build
-stages <https://docs.travis-ci.com/user/build-stages/>`_. Below are the
+To make it more visually appealing on Travis let's run UI tests using [build
+stages](https://docs.travis-ci.com/user/build-stages/). Below are the
 definitions for the jobs to run tests using both Chrome and Firefox on
 separated jobs. The environment variable ``NAME`` is there just provide context
 on Travis UI since you can't set jobs name as of now. On the ``before_install``
@@ -105,8 +107,7 @@ executables are added to the ``PATH``. Finally the tests are running on the
 ``script`` section using ``xvfb-run`` which is required to run the browsers in
 headless mode.
 
-.. code-block:: yaml
-
+```yaml
     - stage: test-ui
       env:
         - NAME=ui-chrome
@@ -130,7 +131,8 @@ headless mode.
         - make run-web-app
       script:
         - xvfb-run py.test -v --driver Firefox path/to/ui/tests
+```
 
 After all that you should be able to run UI tests on Travis. If you want a full
-``.travis.yml`` example you can check `integrade's .travis.yml
-<https://github.com/cloudigrade/integrade/blob/master/.travis.yml>`_.
+``.travis.yml`` example you can check [integrade's
+.travis.yml](https://github.com/cloudigrade/integrade/blob/master/.travis.yml).
